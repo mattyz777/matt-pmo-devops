@@ -1,0 +1,30 @@
+use sea_orm::entity::prelude::*;
+
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+#[sea_orm(table_name = "release_plans")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id: i32,
+
+    pub release_doc_id: i32,
+
+    pub job_name: String,
+
+    pub tag: String,
+
+    pub git_url: String,
+
+    pub rollback_tag: String,
+
+    // 通用字段
+    pub is_delete: bool,
+    pub cdate: DateTime,
+    pub edate: DateTime,
+    pub creator: i32,
+    pub updator: i32,
+}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {}
+
+impl ActiveModelBehavior for ActiveModel {}
