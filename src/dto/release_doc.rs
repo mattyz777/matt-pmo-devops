@@ -1,7 +1,7 @@
 use sea_orm::ActiveValue::{NotSet, Set};
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
-use super::{ReleasePlanDto, ReleaseNoteDto, ChecklistDto, DbAccessTicketDto, SqlReviewTicketDto};
+use super::{ReleasePlanDto, ReleaseNoteDto, ChecklistDto};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -38,8 +38,8 @@ pub struct ReleaseDocDto {
     pub project_type: ProjectType,
     pub release_plans: Vec<ReleasePlanDto>,
     pub release_notes: Vec<ReleaseNoteDto>,
-    pub db_access_tickets: Vec<DbAccessTicketDto>,
-    pub sql_review_tickets: Vec<SqlReviewTicketDto>,
+    pub db_access_tickets: Vec<String>,
+    pub sql_review_tickets: Vec<String>,
     pub checklists: Vec<ChecklistDto>,
 }
 
