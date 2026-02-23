@@ -4,39 +4,39 @@ use serde_json::Value as Json;
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
-#[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
+#[sea_orm(rs_type = "i32", db_type = "Integer")]
 pub enum ReleaseEnvironment {
-    #[sea_orm(string_value = "uat")]
+    #[sea_orm(num_value = 1)]
     Uat,
-    #[sea_orm(string_value = "prod")]
+    #[sea_orm(num_value = 2)]
     Prod,
 }
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
-#[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
+#[sea_orm(rs_type = "i32", db_type = "Integer")]
 pub enum ReleaseType {
-    #[sea_orm(string_value = "sprint")]
+    #[sea_orm(num_value = 1)]
     Sprint,
-    #[sea_orm(string_value = "hotfix")]
+    #[sea_orm(num_value = 2)]
     Hotfix,
 }
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
-#[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
+#[sea_orm(rs_type = "i32", db_type = "Integer")]
 pub enum ProjectType {
-    #[sea_orm(string_value = "onchain")]
+    #[sea_orm(num_value = 1)]
     Onchain,
-    #[sea_orm(string_value = "offchain")]
+    #[sea_orm(num_value = 2)]
     Offchain,
-    #[sea_orm(string_value = "frontend")]
+    #[sea_orm(num_value = 3)]
     Frontend,
-    #[sea_orm(string_value = "backend")]
+    #[sea_orm(num_value = 4)]
     Backend,
-    #[sea_orm(string_value = "risk")]
+    #[sea_orm(num_value = 5)]
     Risk,
-    #[sea_orm(string_value = "settlement")]
+    #[sea_orm(num_value = 6)]
     Settlement,
 }
 
