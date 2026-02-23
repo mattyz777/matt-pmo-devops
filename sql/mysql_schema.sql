@@ -1,8 +1,7 @@
 -- ================================================================================
--- MySQL Schema
+-- MySQL Schema (No Physical Foreign Keys)
 -- ================================================================================
 
-SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS sql_review_tickets;
 DROP TABLE IF EXISTS db_access_tickets;
 DROP TABLE IF EXISTS checklists;
@@ -11,7 +10,6 @@ DROP TABLE IF EXISTS features;
 DROP TABLE IF EXISTS release_notes;
 DROP TABLE IF EXISTS release_plans;
 DROP TABLE IF EXISTS release_docs;
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. 发布文档主表
 CREATE TABLE release_docs (
@@ -22,17 +20,17 @@ CREATE TABLE release_docs (
     is_delete BOOLEAN DEFAULT FALSE COMMENT '是否删除',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME NULL COMMENT '更新时间',
-    creator INT DEFAULT 0 COMMENT '创建人ID',
-    updator INT DEFAULT 0 COMMENT '更新人ID',
+    creator INT NOT NULL COMMENT '创建人ID',
+    updator INT NULL COMMENT '更新人ID',
     INDEX idx_env (env),
     INDEX idx_kind (kind),
     INDEX idx_is_delete (is_delete)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='发布文档表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2. 发布计划表
 CREATE TABLE release_plans (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    release_doc_id INT NOT NULL COMMENT '外键引用',
+    release_doc_id INT NOT NULL,
     job_name VARCHAR(255) NOT NULL,
     tag VARCHAR(255) NOT NULL,
     git_url VARCHAR(512) NOT NULL,
@@ -40,10 +38,9 @@ CREATE TABLE release_plans (
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    INDEX idx_doc_id (release_doc_id),
-    FOREIGN KEY (release_doc_id) REFERENCES release_docs(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_doc_id (release_doc_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 3. 发布说明表
@@ -55,9 +52,9 @@ CREATE TABLE release_notes (
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    FOREIGN KEY (release_doc_id) REFERENCES release_docs(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_doc_id (release_doc_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 4. 功能特性表
@@ -70,9 +67,9 @@ CREATE TABLE features (
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    FOREIGN KEY (release_note_id) REFERENCES release_notes(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_note_id (release_note_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 5. 安全报告表
@@ -84,9 +81,9 @@ CREATE TABLE secure_reports (
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    FOREIGN KEY (release_note_id) REFERENCES release_notes(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_note_id (release_note_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 6. 检查清单表
@@ -94,13 +91,13 @@ CREATE TABLE checklists (
     id INT AUTO_INCREMENT PRIMARY KEY,
     release_doc_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    items JSON COMMENT '数组存储: ["item1", "item2"]',
+    items JSON COMMENT '数组存储',
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    FOREIGN KEY (release_doc_id) REFERENCES release_docs(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_doc_id (release_doc_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 7. 数据库访问工单
@@ -112,9 +109,9 @@ CREATE TABLE db_access_tickets (
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    FOREIGN KEY (release_doc_id) REFERENCES release_docs(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_doc_id (release_doc_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 8. SQL 审核工单
@@ -126,7 +123,7 @@ CREATE TABLE sql_review_tickets (
     is_delete BOOLEAN DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL,
-    creator INT DEFAULT 0,
-    updator INT DEFAULT 0,
-    FOREIGN KEY (release_doc_id) REFERENCES release_docs(id) ON DELETE CASCADE
+    creator INT NOT NULL,
+    updator INT NULL,
+    INDEX idx_release_doc_id (release_doc_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

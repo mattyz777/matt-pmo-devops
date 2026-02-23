@@ -39,7 +39,7 @@ pub struct Model {
     pub created_at: DateTime,
     pub updated_at: Option<DateTime>,
     pub creator: i32,
-    pub updator: i32,
+    pub updator: Option<i32>,
 }
 
 
