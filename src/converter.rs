@@ -1,199 +1,90 @@
-//! Entity 与 BO 之间的转换模块
+//! DTO 与 Entity 之间的批量转换辅助模块
 //!
-//! 本模块集中管理数据库实体 (entity) 与业务对象 (bo) 之间的转换逻辑
+//! 大多数简单转换使用 DTO 的 From trait 实现
+//! 本模块只保留批量转换和带关联数据的组装逻辑
 
-use crate::bo::{
-    ReleaseDocBo, ReleasePlanBo, ReleaseNoteBo, ChecklistBo,
-    DbAccessTicketBo, SqlReviewTicketBo, FeatureBo, SecureReportBo,
-    ReleaseEnvironment, ReleaseType,
-};
+use crate::dto::{ReleaseDocDto, ReleaseNoteDto, FeatureDto, SecureReportDto};
 
 // ============================================================================
-// ReleaseDoc 相关转换
+// ReleaseDoc 组装（带关联数据）
 // ============================================================================
-pub fn release_doc_to_bo_with_relations(
+
+/// 将 ReleaseDoc entity 及其所有关联数据组装成完整的 ReleaseDocDto
+pub fn release_doc_to_dto_with_relations(
     entity: crate::entity::release_doc::Model,
-    release_plans: Vec<ReleasePlanBo>,
-    release_notes: Vec<ReleaseNoteBo>,
-    checklists: Vec<ChecklistBo>,
-    db_access_tickets: Vec<DbAccessTicketBo>,
-    sql_review_tickets: Vec<SqlReviewTicketBo>,
-) -> ReleaseDocBo {
-    ReleaseDocBo {
-        id: entity.id,
-        version: entity.version,
-        env: release_env_entity_to_bo(entity.env),
-        kind: release_type_entity_to_bo(entity.kind),
-        release_plans,
-        release_notes,
-        checklists,
-        db_access_tickets,
-        sql_review_tickets,
-    }
-}
-
-pub fn release_env_entity_to_bo(
-    entity_env: crate::entity::release_doc::ReleaseEnvironment,
-) -> ReleaseEnvironment {
-    match entity_env {
-        crate::entity::release_doc::ReleaseEnvironment::Uat => ReleaseEnvironment::Uat,
-        crate::entity::release_doc::ReleaseEnvironment::Prod => ReleaseEnvironment::Prod,
-    }
-}
-
-pub fn release_env_bo_to_entity(bo_env: ReleaseEnvironment) -> crate::entity::release_doc::ReleaseEnvironment {
-    match bo_env {
-        ReleaseEnvironment::Uat => crate::entity::release_doc::ReleaseEnvironment::Uat,
-        ReleaseEnvironment::Prod => crate::entity::release_doc::ReleaseEnvironment::Prod,
-    }
-}
-
-pub fn release_type_entity_to_bo(
-    entity_kind: crate::entity::release_doc::ReleaseType,
-) -> ReleaseType {
-    match entity_kind {
-        crate::entity::release_doc::ReleaseType::Sprint => ReleaseType::Sprint,
-        crate::entity::release_doc::ReleaseType::Hotfix => ReleaseType::Hotfix,
-    }
-}
-
-pub fn release_type_bo_to_entity(bo_kind: ReleaseType) -> crate::entity::release_doc::ReleaseType {
-    match bo_kind {
-        ReleaseType::Sprint => crate::entity::release_doc::ReleaseType::Sprint,
-        ReleaseType::Hotfix => crate::entity::release_doc::ReleaseType::Hotfix,
-    }
+    release_plans: Vec<crate::dto::ReleasePlanDto>,
+    release_notes: Vec<crate::dto::ReleaseNoteDto>,
+    checklists: Vec<crate::dto::ChecklistDto>,
+    db_access_tickets: Vec<crate::dto::DbAccessTicketDto>,
+    sql_review_tickets: Vec<crate::dto::SqlReviewTicketDto>,
+) -> ReleaseDocDto {
+    let mut dto: ReleaseDocDto = entity.into();
+    dto.release_plans = release_plans;
+    dto.release_notes = release_notes;
+    dto.checklists = checklists;
+    dto.db_access_tickets = db_access_tickets;
+    dto.sql_review_tickets = sql_review_tickets;
+    dto
 }
 
 // ============================================================================
-// ReleasePlan 相关转换
+// ReleaseNote 组装（带关联数据）
 // ============================================================================
-impl From<crate::entity::release_plan::Model> for ReleasePlanBo {
-    fn from(entity: crate::entity::release_plan::Model) -> Self {
-        Self {
-            id: entity.id,
-            job_name: entity.job_name,
-            tag: entity.tag,
-            git_url: entity.git_url,
-            rollback_tag: entity.rollback_tag,
-        }
-    }
-}
 
-pub fn release_plan_entities_to_bos(
-    entities: Vec<crate::entity::release_plan::Model>,
-) -> Vec<ReleasePlanBo> {
-    entities.into_iter().map(|e| e.into()).collect()
-}
-
-// ============================================================================
-// ReleaseNote 相关转换
-// ============================================================================
-pub fn release_note_to_bo_with_relations(
+/// 将 ReleaseNote entity 及其关联数据组装成完整的 ReleaseNoteDto
+pub fn release_note_to_dto_with_relations(
     entity: crate::entity::release_note::Model,
-    features: Vec<FeatureBo>,
-    secure_reports: Vec<SecureReportBo>,
-) -> ReleaseNoteBo {
-    ReleaseNoteBo {
-        id: entity.id,
-        job_name: entity.job_name,
-        git_tag: entity.git_tag,
-        features,
-        secure_reports,
-    }
+    features: Vec<FeatureDto>,
+    secure_reports: Vec<SecureReportDto>,
+) -> ReleaseNoteDto {
+    let mut dto: ReleaseNoteDto = entity.into();
+    dto.features = features;
+    dto.secure_reports = secure_reports;
+    dto
 }
 
 // ============================================================================
-// Feature 相关转换
+// 批量转换辅助函数
 // ============================================================================
-impl From<crate::entity::feature::Model> for FeatureBo {
-    fn from(entity: crate::entity::feature::Model) -> Self {
-        Self {
-            id: entity.id,
-            jira_id: entity.jira_id,
-            link: entity.link,
-            description: entity.description,
-        }
-    }
+
+/// 批量转换 ReleasePlan entity 到 DTO
+pub fn release_plan_entities_to_dtos(
+    entities: Vec<crate::entity::release_plan::Model>,
+) -> Vec<crate::dto::ReleasePlanDto> {
+    entities.into_iter().map(|e| e.into()).collect()
 }
 
-pub fn feature_entities_to_bos(
+/// 批量转换 Feature entity 到 DTO
+pub fn feature_entities_to_dtos(
     entities: Vec<crate::entity::feature::Model>,
-) -> Vec<FeatureBo> {
+) -> Vec<FeatureDto> {
     entities.into_iter().map(|e| e.into()).collect()
 }
 
-// ============================================================================
-// SecureReport 相关转换
-// ============================================================================
-impl From<crate::entity::secure_report::Model> for SecureReportBo {
-    fn from(entity: crate::entity::secure_report::Model) -> Self {
-        Self {
-            id: entity.id,
-            link: entity.link,
-            note: entity.note,
-        }
-    }
-}
-
-pub fn secure_report_entities_to_bos(
+/// 批量转换 SecureReport entity 到 DTO
+pub fn secure_report_entities_to_dtos(
     entities: Vec<crate::entity::secure_report::Model>,
-) -> Vec<SecureReportBo> {
+) -> Vec<SecureReportDto> {
     entities.into_iter().map(|e| e.into()).collect()
 }
 
-// ============================================================================
-// Checklist 相关转换
-// ============================================================================
-impl From<crate::entity::checklist::Model> for ChecklistBo {
-    fn from(entity: crate::entity::checklist::Model) -> Self {
-        Self {
-            id: entity.id,
-            title: entity.title,
-            items: entity.items,
-        }
-    }
-}
-
-pub fn checklist_entities_to_bos(
+/// 批量转换 Checklist entity 到 DTO
+pub fn checklist_entities_to_dtos(
     entities: Vec<crate::entity::checklist::Model>,
-) -> Vec<ChecklistBo> {
+) -> Vec<crate::dto::ChecklistDto> {
     entities.into_iter().map(|e| e.into()).collect()
 }
 
-// ============================================================================
-// DbAccessTicket 相关转换
-// ============================================================================
-impl From<crate::entity::db_access_ticket::Model> for DbAccessTicketBo {
-    fn from(entity: crate::entity::db_access_ticket::Model) -> Self {
-        Self {
-            id: entity.id,
-            title: entity.title,
-            items: entity.items,
-        }
-    }
-}
-
-pub fn db_access_ticket_entities_to_bos(
+/// 批量转换 DbAccessTicket entity 到 DTO
+pub fn db_access_ticket_entities_to_dtos(
     entities: Vec<crate::entity::db_access_ticket::Model>,
-) -> Vec<DbAccessTicketBo> {
+) -> Vec<crate::dto::DbAccessTicketDto> {
     entities.into_iter().map(|e| e.into()).collect()
 }
 
-// ============================================================================
-// SqlReviewTicket 相关转换
-// ============================================================================
-impl From<crate::entity::sql_review_ticket::Model> for SqlReviewTicketBo {
-    fn from(entity: crate::entity::sql_review_ticket::Model) -> Self {
-        Self {
-            id: entity.id,
-            title: entity.title,
-            items: entity.items,
-        }
-    }
-}
-
-pub fn sql_review_ticket_entities_to_bos(
+/// 批量转换 SqlReviewTicket entity 到 DTO
+pub fn sql_review_ticket_entities_to_dtos(
     entities: Vec<crate::entity::sql_review_ticket::Model>,
-) -> Vec<SqlReviewTicketBo> {
+) -> Vec<crate::dto::SqlReviewTicketDto> {
     entities.into_iter().map(|e| e.into()).collect()
 }

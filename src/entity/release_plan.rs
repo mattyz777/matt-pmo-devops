@@ -18,8 +18,8 @@ pub struct Model {
 
     // 通用字段
     pub is_delete: bool,
-    pub cdate: DateTime,
-    pub edate: DateTime,
+    pub created_at: DateTime,
+    pub updated_at: Option<DateTime>,
     pub creator: i32,
     pub updator: i32,
 }
