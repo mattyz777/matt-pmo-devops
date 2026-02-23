@@ -31,7 +31,7 @@ pub async fn update(db: &DatabaseConnection, dto: ReleaseDocDto, operator_id: i3
 }
 
 pub async fn set_ready(db: &DatabaseConnection, id: i32, is_ready: bool, operator_id: i32) -> Result<(), DbErr> {
-    let now = chrono::Utc::now().naive_utc();
+    let now = chrono::Utc::now();
 
     let active_model = release_doc::ActiveModel {
         id: sea_orm::ActiveValue::Set(id),
@@ -46,7 +46,7 @@ pub async fn set_ready(db: &DatabaseConnection, id: i32, is_ready: bool, operato
 }
 
 pub async fn delete(db: &DatabaseConnection, id: i32, operator_id: i32) -> Result<(), DbErr> {
-    let now = chrono::Utc::now().naive_utc();
+    let now = chrono::Utc::now();
 
     let active_model = release_doc::ActiveModel {
         id: sea_orm::ActiveValue::Set(id),

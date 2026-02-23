@@ -2,6 +2,7 @@ use sea_orm::ActiveValue::{NotSet, Set};
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
 use super::{ReleasePlanDto, ReleaseNoteDto, ChecklistDto};
+use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -41,6 +42,8 @@ pub struct ReleaseDocDto {
     pub db_access_tickets: Vec<String>,
     pub sql_review_tickets: Vec<String>,
     pub checklists: Vec<ChecklistDto>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
 impl From<crate::entity::release_doc::Model> for ReleaseDocDto {
@@ -56,13 +59,15 @@ impl From<crate::entity::release_doc::Model> for ReleaseDocDto {
             checklists: serde_json::from_value(entity.checklists).unwrap_or_default(),
             db_access_tickets: serde_json::from_value(entity.db_access_tickets).unwrap_or_default(),
             sql_review_tickets: serde_json::from_value(entity.sql_review_tickets).unwrap_or_default(),
+            created_at: entity.created_at,
+            updated_at: entity.updated_at,
         }
     }
 }
 
 impl ReleaseDocDto {
     pub fn into_create_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
-        let now = chrono::Utc::now().naive_utc();
+        let now = chrono::Utc::now();
 
         crate::entity::release_doc::ActiveModel {
             id: NotSet,
@@ -85,7 +90,7 @@ impl ReleaseDocDto {
     }
 
     pub fn into_update_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
-        let now = chrono::Utc::now().naive_utc();
+        let now = chrono::Utc::now();
 
         crate::entity::release_doc::ActiveModel {
             id: self.id.map(Set).unwrap_or(NotSet),

@@ -19,8 +19,8 @@ CREATE TABLE release_docs (
     sql_review_tickets JSONB DEFAULT '[]'::jsonb,
 
     is_delete BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT NULL,
     creator INT NOT NULL,
     updator INT NULL
 );

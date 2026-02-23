@@ -1,7 +1,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
-
+use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
 #[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
@@ -66,8 +66,8 @@ pub struct Model {
 
     // 通用字段
     pub is_delete: bool,
-    pub created_at: DateTime,
-    pub updated_at: Option<DateTime>,
+    pub created_at: DateTime<Utc>, 
+    pub updated_at: Option<DateTime<Utc>>,
     pub creator: i32,
     pub updator: Option<i32>,
 }
