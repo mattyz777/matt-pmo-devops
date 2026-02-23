@@ -47,19 +47,34 @@ impl From<crate::entity::release_doc::Model> for ReleaseDocDto {
 }
 
 impl ReleaseDocDto {
-    pub fn into_active_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
+    pub fn into_create_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
         let now = chrono::Utc::now().naive_utc();
-        let is_update = self.id.is_some();
+
+        crate::entity::release_doc::ActiveModel {
+            id: NotSet,
+            version: Set(self.version),
+            env: Set(release_env_dto_to_entity(self.env)),
+            kind: Set(release_type_dto_to_entity(self.kind)),
+            is_delete: Set(false),
+            created_at: Set(now),
+            updated_at: NotSet,
+            creator: Set(operator_id),
+            updator: NotSet,
+        }
+    }
+
+    pub fn into_update_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
+        let now = chrono::Utc::now().naive_utc();
 
         crate::entity::release_doc::ActiveModel {
             id: self.id.map(Set).unwrap_or(NotSet),
             version: Set(self.version),
             env: Set(release_env_dto_to_entity(self.env)),
             kind: Set(release_type_dto_to_entity(self.kind)),
-            is_delete: if is_update { NotSet } else { Set(false) },
-            created_at: if is_update { NotSet } else { Set(now) },
-            updated_at: Set(Some(now)),
-            creator: if is_update { NotSet } else { Set(operator_id) },
+            is_delete: NotSet,
+            created_at: NotSet,
+            updated_at: Set(now),
+            creator: NotSet,
             updator: Set(operator_id),
         }
     }

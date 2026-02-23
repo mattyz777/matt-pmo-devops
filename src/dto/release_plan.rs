@@ -23,21 +23,38 @@ impl From<crate::entity::release_plan::Model> for ReleasePlanDto {
 }
 
 impl ReleasePlanDto {
-    pub fn into_active_model(self, release_doc_id: i32, operator_id: i32) -> crate::entity::release_plan::ActiveModel {
+    pub fn into_create_model(self, release_doc_id: i32, operator_id: i32) -> crate::entity::release_plan::ActiveModel {
         let now = chrono::Utc::now().naive_utc();
-        let is_update = self.id.is_some();
 
         crate::entity::release_plan::ActiveModel {
-            id: self.id.map(Set).unwrap_or(NotSet),
-            release_doc_id: if is_update { NotSet } else { Set(release_doc_id) },
+            id: NotSet,
+            release_doc_id: Set(release_doc_id),
             job_name: Set(self.job_name),
             tag: Set(self.tag),
             git_url: Set(self.git_url),
             rollback_tag: Set(self.rollback_tag),
-            is_delete: if is_update { NotSet } else { Set(false) },
-            created_at: if is_update { NotSet } else { Set(now) },
-            updated_at: Set(Some(now)),
-            creator: if is_update { NotSet } else { Set(operator_id) },
+            is_delete: Set(false),
+            created_at: Set(now),
+            updated_at: NotSet,
+            creator: Set(operator_id),
+            updator: NotSet,
+        }
+    }
+
+    pub fn into_update_model(self, operator_id: i32) -> crate::entity::release_plan::ActiveModel {
+        let now = chrono::Utc::now().naive_utc();
+
+        crate::entity::release_plan::ActiveModel {
+            id: self.id.map(Set).unwrap_or(NotSet),
+            release_doc_id: NotSet,
+            job_name: Set(self.job_name),
+            tag: Set(self.tag),
+            git_url: Set(self.git_url),
+            rollback_tag: Set(self.rollback_tag),
+            is_delete: NotSet,
+            created_at: NotSet,
+            updated_at: Set(now),
+            creator: NotSet,
             updator: Set(operator_id),
         }
     }
