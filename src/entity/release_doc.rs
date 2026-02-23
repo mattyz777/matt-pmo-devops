@@ -1,5 +1,6 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use serde_json::Value as Json;
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
@@ -22,6 +23,24 @@ pub enum ReleaseType {
 }
 
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
+#[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
+pub enum ProjectType {
+    #[sea_orm(string_value = "onchain")]
+    Onchain,
+    #[sea_orm(string_value = "offchain")]
+    Offchain,
+    #[sea_orm(string_value = "frontend")]
+    Frontend,
+    #[sea_orm(string_value = "backend")]
+    Backend,
+    #[sea_orm(string_value = "risk")]
+    Risk,
+    #[sea_orm(string_value = "settlement")]
+    Settlement,
+}
+
+
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "release_docs")]
 pub struct Model {
@@ -33,6 +52,17 @@ pub struct Model {
     pub env: ReleaseEnvironment,
 
     pub kind: ReleaseType,
+
+    pub project_type: ProjectType,
+
+    pub is_ready: bool,
+
+    // JSON 字段存储子数据
+    pub release_plans: Json,
+    pub release_notes: Json,
+    pub checklists: Json,
+    pub db_access_tickets: Json,
+    pub sql_review_tickets: Json,
 
     // 通用字段
     pub is_delete: bool,

@@ -1,0 +1,71 @@
+{
+  "version": "v1.0.0",
+  "env": "uat",
+  "kind": "sprint",
+  "project_type": "onchain",
+  "release_notes": [
+    {
+      "job_name": "user-service",
+      "git_tag": "v1.0.0",
+      "features": [
+        {
+          "jira_id": "PMO-101",
+          "link": "https://jira.company/browse/PMO-101",
+          "description": "Add user registration with email verification"
+        },
+        {
+          "jira_id": "PMO-102",
+          "link": "https://jira.company/browse/PMO-102",
+          "description": "Update user profile"
+        }
+      ],
+      "secure_reports": [
+        {
+          "link": "https://sonarqube.company/report/1.doc",
+          "note": "No critical vulnerabilities found"
+        },
+        {
+          "link": "https://sonarqube.company/report/2.doc",
+          "note": "和安全沟通，不需要修改"
+        }
+      ]
+    }
+  ],
+  "release_plans": [
+    {
+      "job_name": "user-service-deploy",
+      "tag": "v1.0.1",
+      "git_url": "https://github.com/company/user-service.git",
+      "rollback_tag": "v0.9.5"
+    },
+    {
+      "job_name": "php-service-deploy",
+      "tag": "v1.0.2",
+      "git_url": "https://github.com/company/php-service.git",
+      "rollback_tag": "v0.9.6"
+    }
+  ],
+  "db_access_tickets": ["lark001", "lark002", "lark003"],
+  "sql_review_tickets": [
+    "https://mysqlaudit.hyperpay.online/detail/3119/",
+    "https://mysqlaudit.hyperpay.online/detail/3120/",
+    "https://mysqlaudit.hyperpay.online/detail/3121/"
+  ],
+  "checklists": [
+    {
+      "title": "发布代码",
+      "items": ["执行 jenkins 发布"]
+    },
+    {
+      "title": "配置后台菜单和app参数",
+      "items": ["v5.6.17版本发布文档"]
+    },
+    {
+      "title": "服务器执行命令",
+      "items": [
+        "supervisorctl restart markets_benefit_task_withdraw",
+        "supervisorctl restart markets_benefit_task_reward"
+      ]
+    }
+  ]
+}
