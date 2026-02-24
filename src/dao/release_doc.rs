@@ -27,7 +27,8 @@ pub async fn create(db: &DatabaseConnection, dto: ReleaseDocDto, operator_id: i3
 
 pub async fn update(db: &DatabaseConnection, dto: ReleaseDocDto, operator_id: i32) -> Result<release_doc::Model, DbErr> {
     let active_model = dto.into_update_model(operator_id);
-    active_model.update(db).await
+    let model = active_model.update(db).await?;
+    Ok(model)
 }
 
 pub async fn set_ready(db: &DatabaseConnection, id: i32, is_ready: bool, operator_id: i32) -> Result<(), DbErr> {

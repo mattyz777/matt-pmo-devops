@@ -29,10 +29,9 @@ pub enum ProjectType {
     Settlement,
 }
 
-/// 发布文档 DTO
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ReleaseDocDto {
-    pub id: Option<i32>,
+pub struct ReleaseDocRequestDto {
     pub version: String,
     pub env: ReleaseEnvironment,
     pub kind: ReleaseType,
@@ -42,30 +41,9 @@ pub struct ReleaseDocDto {
     pub db_access_tickets: Vec<String>,
     pub sql_review_tickets: Vec<String>,
     pub checklists: Vec<ChecklistDto>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: Option<DateTime<Utc>>,
 }
 
-impl From<crate::entity::release_doc::Model> for ReleaseDocDto {
-    fn from(entity: crate::entity::release_doc::Model) -> Self {
-        Self {
-            id: Some(entity.id),
-            version: entity.version,
-            env: release_env_entity_to_dto(entity.env),
-            kind: release_type_entity_to_dto(entity.kind),
-            project_type: project_type_entity_to_dto(entity.project_type),
-            release_plans: serde_json::from_value(entity.release_plans).unwrap_or_default(),
-            release_notes: serde_json::from_value(entity.release_notes).unwrap_or_default(),
-            checklists: serde_json::from_value(entity.checklists).unwrap_or_default(),
-            db_access_tickets: serde_json::from_value(entity.db_access_tickets).unwrap_or_default(),
-            sql_review_tickets: serde_json::from_value(entity.sql_review_tickets).unwrap_or_default(),
-            created_at: entity.created_at,
-            updated_at: entity.updated_at,
-        }
-    }
-}
-
-impl ReleaseDocDto {
+impl ReleaseDocRequestDto {
     pub fn into_create_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
         let now = chrono::Utc::now();
 
@@ -89,11 +67,11 @@ impl ReleaseDocDto {
         }
     }
 
-    pub fn into_update_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
+    pub fn into_update_model(self, record_id: i32, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
         let now = chrono::Utc::now();
 
         crate::entity::release_doc::ActiveModel {
-            id: self.id.map(Set).unwrap_or(NotSet),
+            id: Set(record_id),
             version: Set(self.version),
             env: Set(release_env_dto_to_entity(self.env)),
             kind: Set(release_type_dto_to_entity(self.kind)),
@@ -109,6 +87,42 @@ impl ReleaseDocDto {
             updated_at: Set(Some(now)),
             creator: NotSet,
             updator: Set(Some(operator_id)),
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReleaseDocResponseDto {
+    pub id: i32,
+    pub version: String,
+    pub env: ReleaseEnvironment,
+    pub kind: ReleaseType,
+    pub project_type: ProjectType,
+    pub release_plans: Vec<ReleasePlanDto>,
+    pub release_notes: Vec<ReleaseNoteDto>,
+    pub db_access_tickets: Vec<String>,
+    pub sql_review_tickets: Vec<String>,
+    pub checklists: Vec<ChecklistDto>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+impl From<crate::entity::release_doc::Model> for ReleaseDocResponseDto {
+    fn from(entity: crate::entity::release_doc::Model) -> Self {
+        Self {
+            id: Some(entity.id),
+            version: entity.version,
+            env: release_env_entity_to_dto(entity.env),
+            kind: release_type_entity_to_dto(entity.kind),
+            project_type: project_type_entity_to_dto(entity.project_type),
+            release_plans: serde_json::from_value(entity.release_plans).unwrap_or_default(),
+            release_notes: serde_json::from_value(entity.release_notes).unwrap_or_default(),
+            checklists: serde_json::from_value(entity.checklists).unwrap_or_default(),
+            db_access_tickets: serde_json::from_value(entity.db_access_tickets).unwrap_or_default(),
+            sql_review_tickets: serde_json::from_value(entity.sql_review_tickets).unwrap_or_default(),
+            created_at: Some(entity.created_at),
+            updated_at: entity.updated_at,
         }
     }
 }

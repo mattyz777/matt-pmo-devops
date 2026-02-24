@@ -1,4 +1,7 @@
 use serde::{Deserialize, Serialize};
+use axum::{Json, response::{IntoResponse, Response}};
+
+
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiResponse<T> {
@@ -32,3 +35,11 @@ impl<T> ApiResponse<T> {
         }
     }
 }
+
+
+impl<T:Serialize> IntoResponse for ApiResponse<T> {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
