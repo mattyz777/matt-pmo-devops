@@ -43,6 +43,24 @@ pub struct ReleaseDocRequestDto {
     pub checklists: Vec<ChecklistDto>,
 }
 
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReleaseDocResponseDto {
+    pub id: i32,
+    pub version: String,
+    pub env: ReleaseEnvironment,
+    pub kind: ReleaseType,
+    pub project_type: ProjectType,
+    pub release_plans: Vec<ReleasePlanDto>,
+    pub release_notes: Vec<ReleaseNoteDto>,
+    pub db_access_tickets: Vec<String>,
+    pub sql_review_tickets: Vec<String>,
+    pub checklists: Vec<ChecklistDto>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+
 impl ReleaseDocRequestDto {
     pub fn into_create_model(self, operator_id: i32) -> crate::entity::release_doc::ActiveModel {
         let now = chrono::Utc::now();
@@ -92,26 +110,10 @@ impl ReleaseDocRequestDto {
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ReleaseDocResponseDto {
-    pub id: i32,
-    pub version: String,
-    pub env: ReleaseEnvironment,
-    pub kind: ReleaseType,
-    pub project_type: ProjectType,
-    pub release_plans: Vec<ReleasePlanDto>,
-    pub release_notes: Vec<ReleaseNoteDto>,
-    pub db_access_tickets: Vec<String>,
-    pub sql_review_tickets: Vec<String>,
-    pub checklists: Vec<ChecklistDto>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: Option<DateTime<Utc>>,
-}
-
 impl From<crate::entity::release_doc::Model> for ReleaseDocResponseDto {
     fn from(entity: crate::entity::release_doc::Model) -> Self {
         Self {
-            id: Some(entity.id),
+            id: entity.id,
             version: entity.version,
             env: release_env_entity_to_dto(entity.env),
             kind: release_type_entity_to_dto(entity.kind),
@@ -121,11 +123,12 @@ impl From<crate::entity::release_doc::Model> for ReleaseDocResponseDto {
             checklists: serde_json::from_value(entity.checklists).unwrap_or_default(),
             db_access_tickets: serde_json::from_value(entity.db_access_tickets).unwrap_or_default(),
             sql_review_tickets: serde_json::from_value(entity.sql_review_tickets).unwrap_or_default(),
-            created_at: Some(entity.created_at),
+            created_at: entity.created_at,
             updated_at: entity.updated_at,
         }
     }
 }
+
 
 pub fn release_env_entity_to_dto(
     entity_env: crate::entity::release_doc::ReleaseEnvironment,
@@ -136,12 +139,14 @@ pub fn release_env_entity_to_dto(
     }
 }
 
+
 pub fn release_env_dto_to_entity(dto_env: ReleaseEnvironment) -> crate::entity::release_doc::ReleaseEnvironment {
     match dto_env {
         ReleaseEnvironment::Uat => crate::entity::release_doc::ReleaseEnvironment::Uat,
         ReleaseEnvironment::Prod => crate::entity::release_doc::ReleaseEnvironment::Prod,
     }
 }
+
 
 pub fn release_type_entity_to_dto(
     entity_kind: crate::entity::release_doc::ReleaseType,
@@ -152,12 +157,14 @@ pub fn release_type_entity_to_dto(
     }
 }
 
+
 pub fn release_type_dto_to_entity(dto_kind: ReleaseType) -> crate::entity::release_doc::ReleaseType {
     match dto_kind {
         ReleaseType::Sprint => crate::entity::release_doc::ReleaseType::Sprint,
         ReleaseType::Hotfix => crate::entity::release_doc::ReleaseType::Hotfix,
     }
 }
+
 
 pub fn project_type_entity_to_dto(
     entity_kind: crate::entity::release_doc::ProjectType,
@@ -172,6 +179,7 @@ pub fn project_type_entity_to_dto(
     }
 }
 
+
 pub fn project_type_dto_to_entity(dto_kind: ProjectType) -> crate::entity::release_doc::ProjectType {
     match dto_kind {
         ProjectType::Onchain => crate::entity::release_doc::ProjectType::Onchain,
@@ -182,3 +190,4 @@ pub fn project_type_dto_to_entity(dto_kind: ProjectType) -> crate::entity::relea
         ProjectType::Settlement => crate::entity::release_doc::ProjectType::Settlement,
     }
 }
+

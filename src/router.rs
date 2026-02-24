@@ -1,4 +1,4 @@
-use axum::{Router, routing::{get, post}};
+use axum::{Router, routing::{get, post, put}};
 use crate::handler::{common, user, release_doc};
 use crate::state::AppState;
 
@@ -25,5 +25,6 @@ fn user_routes() -> Router<AppState> {
 fn release_doc_routes() -> Router<AppState> {
     Router::new()
         .route("/", post(release_doc::create))
+        .route("/{id}", put(release_doc::update))
         .route("/{id}", get(release_doc::get))
 }

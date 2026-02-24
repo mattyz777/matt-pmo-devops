@@ -6,7 +6,7 @@ pub mod feature;
 pub mod secure_report;
 pub mod response;
 
-pub use release_doc::{ReleaseDocDto, ReleaseEnvironment, ReleaseType, ProjectType};
+pub use release_doc::{ReleaseDocRequestDto, ReleaseDocResponseDto, ReleaseEnvironment, ReleaseType, ProjectType};
 pub use release_plan::ReleasePlanDto;
 pub use release_note::ReleaseNoteDto;
 pub use checklist::ChecklistDto;

@@ -1,6 +1,6 @@
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, DbErr};
 use crate::entity::release_doc;
-use crate::dto::ReleaseDocDto;
+use crate::dto::ReleaseDocRequestDto;
 
 pub async fn get_by_id(db: &DatabaseConnection, id: i32) -> Result<Option<release_doc::Model>, DbErr> {
     release_doc::Entity::find_by_id(id)
@@ -16,7 +16,7 @@ pub async fn list(db: &DatabaseConnection) -> Result<Vec<release_doc::Model>, Db
         .await
 }
 
-pub async fn create(db: &DatabaseConnection, dto: ReleaseDocDto, operator_id: i32) -> Result<i32, DbErr> {
+pub async fn create(db: &DatabaseConnection, dto: ReleaseDocRequestDto, operator_id: i32) -> Result<i32, DbErr> {
     let active_model = dto.into_create_model(operator_id);
     let result = release_doc::Entity::insert(active_model)
         .exec(db)
@@ -25,8 +25,8 @@ pub async fn create(db: &DatabaseConnection, dto: ReleaseDocDto, operator_id: i3
     Ok(result.last_insert_id)
 }
 
-pub async fn update(db: &DatabaseConnection, dto: ReleaseDocDto, operator_id: i32) -> Result<release_doc::Model, DbErr> {
-    let active_model = dto.into_update_model(operator_id);
+pub async fn update(db: &DatabaseConnection, dto: ReleaseDocRequestDto, record_id: i32, operator_id: i32) -> Result<release_doc::Model, DbErr> {
+    let active_model = dto.into_update_model(record_id, operator_id);
     let model = active_model.update(db).await?;
     Ok(model)
 }
