@@ -65,11 +65,11 @@ pub struct Model {
     pub sql_review_tickets: Json,
 
     // 通用字段
-    pub is_delete: bool,
+    pub is_deleted: bool,
     pub created_at: DateTime<Utc>, 
     pub updated_at: Option<DateTime<Utc>>,
-    pub creator: i32,
-    pub updator: Option<i32>,
+    pub created_by: i32,
+    pub updated_by: Option<i32>,
 }
 
 

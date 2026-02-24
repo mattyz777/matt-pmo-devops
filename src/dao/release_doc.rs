@@ -4,14 +4,14 @@ use crate::dto::ReleaseDocRequestDto;
 
 pub async fn get_by_id(db: &DatabaseConnection, id: i32) -> Result<Option<release_doc::Model>, DbErr> {
     release_doc::Entity::find_by_id(id)
-        .filter(release_doc::Column::IsDelete.eq(false))
+        .filter(release_doc::Column::IsDeleted.eq(false))
         .one(db)
         .await
 }
 
 pub async fn list(db: &DatabaseConnection) -> Result<Vec<release_doc::Model>, DbErr> {
     release_doc::Entity::find()
-        .filter(release_doc::Column::IsDelete.eq(false))
+        .filter(release_doc::Column::IsDeleted.eq(false))
         .all(db)
         .await
 }
@@ -38,7 +38,7 @@ pub async fn set_ready(db: &DatabaseConnection, id: i32, is_ready: bool, operato
         id: sea_orm::ActiveValue::Set(id),
         is_ready: sea_orm::ActiveValue::Set(is_ready),
         updated_at: sea_orm::ActiveValue::Set(Some(now)),
-        updator: sea_orm::ActiveValue::Set(Some(operator_id)),
+        updated_by: sea_orm::ActiveValue::Set(Some(operator_id)),
         ..Default::default()
     };
 
@@ -51,9 +51,9 @@ pub async fn delete(db: &DatabaseConnection, id: i32, operator_id: i32) -> Resul
 
     let active_model = release_doc::ActiveModel {
         id: sea_orm::ActiveValue::Set(id),
-        is_delete: sea_orm::ActiveValue::Set(true),
+        is_deleted: sea_orm::ActiveValue::Set(true),
         updated_at: sea_orm::ActiveValue::Set(Some(now)),
-        updator: sea_orm::ActiveValue::Set(Some(operator_id)),
+        updated_by: sea_orm::ActiveValue::Set(Some(operator_id)),
         ..Default::default()
     };
 
