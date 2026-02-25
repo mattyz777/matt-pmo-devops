@@ -1,8 +1,6 @@
 use crate::state::AppState;
 use crate::dao::user as user_dao;
-use crate::dto::{
-    UserRequestDto, UserUpdateDto, UserResponseDto, UserListQueryDto, UserListResponseDto,
-};
+use crate::dto::{UserRequestDto, UserUpdateDto, UserResponseDto, PageResult};
 use crate::utils::encrypt::hash_password;
 
 
@@ -41,16 +39,17 @@ pub async fn get_by_username(
 
 pub async fn list(
     state: &AppState,
-    query: UserListQueryDto,
-) -> Result<UserListResponseDto, sea_orm::DbErr> {
-    let (models, total) = user_dao::list(&state.db, query.page, query.page_size).await?;
+    page: Option<u64>,
+    page_size: Option<u64>,
+) -> Result<PageResult<UserResponseDto>, sea_orm::DbErr> {
+    let (models, total) = user_dao::list(&state.db, page, page_size).await?;
     let data: Vec<UserResponseDto> = models.into_iter().map(|m| m.into()).collect();
 
-    Ok(UserListResponseDto {
+    Ok(PageResult {
         data,
         total,
-        page: query.page.unwrap_or(1),
-        page_size: query.page_size.unwrap_or(20),
+        page: page.unwrap_or(1),
+        page_size: page_size.unwrap_or(20),
     })
 }
 

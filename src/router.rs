@@ -19,7 +19,10 @@ fn api_routes() -> Router<AppState> {
 
 fn user_routes() -> Router<AppState> {
     Router::new()
-        .route("/{id}", get(user::get_user_by_id))
+        .route("/", post(user::create))
+        .route("/list", post(user::list))
+        .route("/{id}", get(user::get_by_id))
+        .route("/{id}", put(user::update))
 }
 
 fn release_doc_routes() -> Router<AppState> {

@@ -1,6 +1,7 @@
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, DbErr};
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, DbErr};
 use crate::entity::release_doc;
 use crate::dto::ReleaseDocRequestDto;
+
 
 pub async fn get_by_id(db: &DatabaseConnection, id: i32) -> Result<Option<release_doc::Model>, DbErr> {
     release_doc::Entity::find_by_id(id)
@@ -35,10 +36,10 @@ pub async fn set_ready(db: &DatabaseConnection, id: i32, is_ready: bool, operato
     let now = chrono::Utc::now();
 
     let active_model = release_doc::ActiveModel {
-        id: sea_orm::ActiveValue::Set(id),
-        is_ready: sea_orm::ActiveValue::Set(is_ready),
-        updated_at: sea_orm::ActiveValue::Set(Some(now)),
-        updated_by: sea_orm::ActiveValue::Set(Some(operator_id)),
+        id: Set(id),
+        is_ready: Set(is_ready),
+        updated_at: Set(Some(now)),
+        updated_by: Set(Some(operator_id)),
         ..Default::default()
     };
 
@@ -50,10 +51,10 @@ pub async fn delete(db: &DatabaseConnection, id: i32, operator_id: i32) -> Resul
     let now = chrono::Utc::now();
 
     let active_model = release_doc::ActiveModel {
-        id: sea_orm::ActiveValue::Set(id),
-        is_deleted: sea_orm::ActiveValue::Set(true),
-        updated_at: sea_orm::ActiveValue::Set(Some(now)),
-        updated_by: sea_orm::ActiveValue::Set(Some(operator_id)),
+        id: Set(id),
+        is_deleted: Set(true),
+        updated_at: Set(Some(now)),
+        updated_by: Set(Some(operator_id)),
         ..Default::default()
     };
 

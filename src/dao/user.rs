@@ -1,4 +1,4 @@
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, DbErr, QueryOrder, PaginatorTrait};
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, DbErr, QueryOrder, PaginatorTrait};
 use crate::entity::user;
 
 const DEFAULT_PAGE_SIZE: u64 = 20;
@@ -22,10 +22,10 @@ pub async fn delete(db: &DatabaseConnection, id: i32, operator_id: i32) -> Resul
     let now = chrono::Utc::now();
 
     let active_model = user::ActiveModel {
-        id: sea_orm::ActiveValue::Set(id),
-        is_deleted: sea_orm::ActiveValue::Set(true),
-        updated_at: sea_orm::ActiveValue::Set(Some(now)),
-        updated_by: sea_orm::ActiveValue::Set(Some(operator_id)),
+        id: Set(id),
+        is_deleted: Set(true),
+        updated_at: Set(Some(now)),
+        updated_by: Set(Some(operator_id)),
         ..Default::default()
     };
 

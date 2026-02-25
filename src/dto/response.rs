@@ -2,6 +2,14 @@ use serde::{Deserialize, Serialize};
 use axum::{Json, response::{IntoResponse, Response}};
 
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PageResult<T> {
+    pub data: Vec<T>,
+    pub total: u64,
+    pub page: u64,
+    pub page_size: u64,
+}
+
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiResponse<T> {

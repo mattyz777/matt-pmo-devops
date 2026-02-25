@@ -13,5 +13,5 @@ pub use release_note::ReleaseNoteDto;
 pub use checklist::ChecklistDto;
 pub use feature::FeatureDto;
 pub use secure_report::SecureReportDto;
-pub use user::{UserRequestDto, UserUpdateDto, UserResponseDto, UserListQueryDto, UserListResponseDto, UserType, UserStatus};
-pub use response::ApiResponse;
+pub use user::{UserRequestDto, UserUpdateDto, UserResponseDto, UserListQueryDto, UserType, UserStatus};
+pub use response::{ApiResponse, PageResult};
